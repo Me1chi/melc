@@ -32,9 +32,6 @@ To set if the number is signed or not:
 |     `-s`    |    signed    |
 |     `-u`    |   unsigned   |
 
-NOTE: ONLY DECIMAL NUMBERS HAVE THE MINUS SIGN (-)
-FOR NEGATIVE REPRESENTATIONS.
-
 <br>
 
 To set the number length:
@@ -55,7 +52,7 @@ need to call the tool with the all flags currently in use every time.
 |:--------:|:----------:|:---------:|
 |  `signed`  |`true` / `false`|    `true`   |
 |  `length`  | `8` / `16` / `32` / `64` |     `32`    |
-|  `input`   |`"bin"` / `"oct"` / `"dec"` / `"hex"` |  `"hex"`  |
+|  `base`   |`"bin"` / `"oct"` / `"dec"` / `"hex"` |  `"hex"`  |
 
 Using the `--set` flag within a call will adjust the config file
 according to the current call flags.

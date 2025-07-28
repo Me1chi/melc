@@ -1,67 +1,36 @@
-
-
-
-use clap::{Arg, ArgGroup, Parser, Subcommand};
-
-#[derive(Parser, Debug)]
-#[command(
-    name = "melc",
-    version = "0.1",
-    author = "Melchior Boaretto Neto",
-    about = "Simple usual bases converter",
-    group(ArgGroup::new("base")),
-    group(ArgGroup::new("sign")),
-    group(ArgGroup::new("size")),
-)]
-struct Args {
-
-    // Base arguments
-    #[arg(short = 'b', long = "bin", group = "base", help = "Binary base")]
-    bin: bool,
-
-    #[arg(short = 'o', long = "oct", group = "base", help = "Octal base")]
-    oct: bool,
-
-    #[arg(short = 'd', long = "dec", group = "base", help = "Decimal base")]
-    dec: bool,
-
-    #[arg(short = 'x', long = "hex", group = "base", help = "Hexadecimal base")]
-    hex: bool,
-
-
-    // Sign arguments
-    #[arg(short = 'u', group = "sign", help = "unsigned")]
-    unsigned: bool,
-    
-    #[arg(short = 's', group = "sign", help = "signed")]
-    signed: bool,
-
-
-    // Length arguments
-    #[arg(long = "byte", group = "size")]
-    byte: bool,
-    
-    #[arg(long = "word", group = "size")]
-    word: bool,
-    
-    #[arg(long = "dword", group = "size")]
-    dword: bool,
-
-    #[arg(long = "qword", group = "size")]
-    qword: bool,
-
-    // Set argument
-    #[arg(long = "set", help = "change the config file")]
-    setter: bool,
-
-    // Number argument (Will be a string)
-    number: Option<String>,
-    
-}
+use melc::configio::ConfigFile;
+use melc::input::Args;
+use clap::Parser;
 
 fn main() {
 
-    let args = Args::parse();
+    let config = ConfigFile::load_config_to_string();
+    let config = if let Ok(string) = config {
+        toml::from_str(&string).ok()
+    } else {
+        Some(ConfigFile::new_default())
+    };
 
-    println!("Argumentos lidos com sucesso!");
+    let mut safe_config = if let Some(config) = config {
+        config.to_safe_config()
+    } else {
+        ConfigFile::new_default().to_safe_config()
+    };
+
+    let args = Args::parse();
+    args.adapt_safe_config(&mut safe_config);
+
+    //Time to get the number
+    let input_number = args.get_number(
+        &safe_config.base,
+        safe_config.signed,
+        &safe_config.length
+    ).expect("Number is in the wrong form"); 
+
+    input_number.print_all();
+
+    if args.is_setter_on() {
+        ConfigFile::from_safe_config(safe_config).store_config().expect("Fatal error!");
+    }
+
 }
