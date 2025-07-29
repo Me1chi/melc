@@ -2,27 +2,30 @@ use std::fmt::{Binary, Display, Octal, UpperHex};
 
 
 pub trait Number: Display + Binary + Octal + UpperHex {
-    fn print_bin(&self) {
-        println!("Binary: {:b}", self);
+    fn print_bin(&self, word_length: Length) {
+        let padding = word_length as usize;
+        println!("Binary: {:0>width$b}", self, width = padding);
     }
 
-    fn print_oct(&self) {
-        println!("Octal: {:o}", self);
+    fn print_oct(&self, word_length: Length) {
+        let padding = (word_length as usize).div_ceil(3);
+        println!("Octal: {:0>width$o}", self, width = padding);
     }
 
     fn print_dec(&self) {
         println!("Decimal: {}", self);
     }
 
-    fn print_hex(&self) {
-        println!("Hexadecimal: {:X}", self);
+    fn print_hex(&self, word_length: Length) {
+        let padding = (word_length as usize)/4;
+        println!("Hexadecimal: {:0>width$X}", self, width = padding);
     }
 
-    fn print_all(&self) {
-        self.print_bin();
-        self.print_oct();
+    fn print_all(&self, word_length: &Length) {
+        self.print_bin(word_length.clone());
+        self.print_oct(word_length.clone());
         self.print_dec();
-        self.print_hex();
+        self.print_hex(word_length.clone());
     }
 }
 
@@ -37,12 +40,12 @@ impl Number for i32 {}
 impl Number for i64 {}
 impl Number for i128 {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Length {
-    Byte,
-    Word,
-    Dword,
-    Qword,
+    Byte = 8,
+    Word = 16,
+    Dword = 32,
+    Qword = 64,
 }
 
 #[repr(u32)]

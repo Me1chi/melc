@@ -27,8 +27,8 @@ fn main() {
         &safe_config.length
     ).expect("Number is in the wrong form"); 
 
-    input_number.print_all();
-
+    input_number.print_all(&safe_config.length);
+ 
     if args.is_setter_on() {
         ConfigFile::from_safe_config(safe_config).store_config().expect("Fatal error!");
     }
